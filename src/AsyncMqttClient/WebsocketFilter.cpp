@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 //#include <Arduino.h>
+#include "esp_idf_version.h"
 #include "esp32-hal-log.h"
 #include "mbedtls/base64.h"
 #include "mbedtls/sha1.h"
@@ -344,7 +345,11 @@ void WebsocketFilter::_runHandshakeResponseCheck(void)
                     strcat(wskey, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
 
                     unsigned char sha1_output[20];
+#if ESP_IDF_VERSION_MAJOR < 5
                     mbedtls_sha1_ret((unsigned char *)wskey, 60, sha1_output);
+#else
+                    mbedtls_sha1((unsigned char *)wskey, 60, sha1_output);
+#endif
 
                     char expected_base64[29]; size_t dummy_olen;
                     memset(expected_base64, 0, sizeof(expected_base64));
